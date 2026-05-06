@@ -11,11 +11,19 @@ let aboutWindow;
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     title: "ImageComp",
-    width: 500,
+    width: isDev ? 700 : 500,
     height: 600,
     icon: '${__dirname}/assets/icons/Icon_256x256.png',
-    resizable: isDev ? true : false
+    resizable: isDev ? true : false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
   });
+
+  if (isDev) {
+    mainWindow.webContents.openDevTools()
+  }
   mainWindow.loadFile('./app/index.html');
 }
 
