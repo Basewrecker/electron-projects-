@@ -25,7 +25,7 @@ function createAboutWindow() {
     width: 200,
     height: 300,
     icon: '${__dirname}/assets/icons/Icon_256x256.png',
-    resizable: isDev ? true : false
+    resizable: false,
   });
   aboutWindow.loadFile('./app/about.html');
 }
