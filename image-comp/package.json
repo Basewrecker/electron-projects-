@@ -1,0 +1,14 @@
+{
+  "name": "image-comp",
+  "version": "1.0.0",
+  "description": "Compress images",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Rs",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^41.5.0"
+  }
+}
