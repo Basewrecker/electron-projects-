@@ -4,11 +4,16 @@
   "description": "Compress images",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dev": "nodemon --exec electron ."
   },
   "author": "Rs",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^41.5.0"
+    "electron": "^41.5.0",
+    "electron-reloader": "^1.2.3"
+  },
+  "dependencies": {
+    "nodemon": "^3.1.14"
   }
 }
