@@ -1,71 +1,81 @@
-const { app, BrowserWindow, Menu } = require('electron')
-const log = require('electron-log')
+const { app, BrowserWindow, Menu } = require("electron");
+const log = require("electron-log");
+const Store = require("./Store");
 
 // Set env
-process.env.NODE_ENV = 'development'
+process.env.NODE_ENV = "development";
 
-const isDev = process.env.NODE_ENV !== 'production' ? true : false
-const isMac = process.platform === 'darwin' ? true : false
+const isDev = process.env.NODE_ENV !== "production" ? true : false;
+const isMac = process.platform === "darwin" ? true : false;
 
-let mainWindow
+let mainWindow;
+const store = new Store({
+  configName: "user-settings",
+  defaults: {
+    settings: {
+      cpuOverload: 80,
+      alertFrequency: 5,
+    },
+  },
+});
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
-    title: 'SysTop',
+    title: "SysTop",
     width: isDev ? 700 : 355,
     height: 600,
-    icon: './assets/icons/icon.png',
+    icon: "./assets/icons/icon.png",
     resizable: isDev ? true : false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
     },
-  })
+  });
 
   if (isDev) {
-    mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools();
   }
 
-  mainWindow.loadFile('./app/index.html')
+  mainWindow.loadFile("./app/index.html");
 }
 
-app.on('ready', () => {
-  createMainWindow()
+app.on("ready", () => {
+  createMainWindow();
 
-  const mainMenu = Menu.buildFromTemplate(menu)
-  Menu.setApplicationMenu(mainMenu)
-})
+  const mainMenu = Menu.buildFromTemplate(menu);
+  Menu.setApplicationMenu(mainMenu);
+});
 
 const menu = [
-  ...(isMac ? [{ role: 'appMenu' }] : []),
+  ...(isMac ? [{ role: "appMenu" }] : []),
   {
-    role: 'fileMenu',
+    role: "fileMenu",
   },
   ...(isDev
     ? [
         {
-          label: 'Developer',
+          label: "Developer",
           submenu: [
-            { role: 'reload' },
-            { role: 'forcereload' },
-            { type: 'separator' },
-            { role: 'toggledevtools' },
+            { role: "reload" },
+            { role: "forcereload" },
+            { type: "separator" },
+            { role: "toggledevtools" },
           ],
         },
       ]
     : []),
-]
+];
 
-app.on('window-all-closed', () => {
+app.on("window-all-closed", () => {
   if (!isMac) {
-    app.quit()
+    app.quit();
   }
-})
+});
 
-app.on('activate', () => {
+app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createMainWindow()
+    createMainWindow();
   }
-})
+});
 
-app.allowRendererProcessReuse = true
+app.allowRendererProcessReuse = true;
