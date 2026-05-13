@@ -5,6 +5,8 @@ const cpu = new CPUMonitor()
 const mem = new MemoryMonitor()
 const os = new SystemMonitor()
 
+let cpuOverload = 5;
+
 function getCpuUsage() {
     return new Promise((resolve) => {
         const cpus1 = nodeOs.cpus()
@@ -27,6 +29,12 @@ setInterval(() => {
     getCpuUsage().then(usage => {
         document.getElementById('cpu-usage').innerText = usage + '%'
         document.getElementById('cpu-free').innerText = (100 - usage).toFixed(1) + '%'
+        document.getElementById('cpu-progress').style.width = usage + '%'
+        if (usage > overload) {
+           document.getElementById('cpu-progress').style.background = 'red'    
+        } else {
+           document.getElementById('cpu-progress').style.background = '#30c88b'
+        }
     })
 }, 1500);
 
