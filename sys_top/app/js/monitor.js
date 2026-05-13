@@ -1,12 +1,18 @@
 const path = require("path");
 const nodeOs = require("os");
 const { CPUMonitor, MemoryMonitor, SystemMonitor } = require("node-os-utils");
+const { ipcRenderer } = require("electron");
 const cpu = new CPUMonitor();
 const mem = new MemoryMonitor();
 const os = new SystemMonitor();
 
-let cpuOverload = 85;
-let alertFrequency = 1;
+let cpuOverload;
+let alertFrequency;
+
+ipcRenderer.on("settings:get", (e, settings) => {
+  cpuOverload = +settings.cpuOverload;
+  alertFrequency = +settings.alertFrequency;
+});
 
 function getCpuUsage() {
   return new Promise((resolve) => {
