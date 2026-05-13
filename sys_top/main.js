@@ -1,4 +1,5 @@
-const { app, BrowserWindow, Menu } = require("electron");
+const { app, BrowserWindow, Menu, Tray } = require("electron");
+const path = require("path");
 const log = require("electron-log");
 const Store = require("./Store");
 const { ipcMain } = require("electron/main");
@@ -10,6 +11,8 @@ const isDev = process.env.NODE_ENV !== "production" ? true : false;
 const isMac = process.platform === "darwin" ? true : false;
 
 let mainWindow;
+let tray;
+
 const store = new Store({
   configName: "user-settings",
   defaults: {
@@ -26,6 +29,8 @@ function createMainWindow() {
     width: isDev ? 700 : 355,
     height: 600,
     icon: "./assets/icons/icon.png",
+    show: false,
+    opacity: 0.9,
     resizable: isDev ? true : false,
     webPreferences: {
       nodeIntegration: true,
@@ -49,12 +54,57 @@ app.on("ready", () => {
 
   const mainMenu = Menu.buildFromTemplate(menu);
   Menu.setApplicationMenu(mainMenu);
+  mainWindow.on("close", (e) => {
+    if (!app.isQuitting) {
+      e.preventDefault();
+      mainWindow.hide();
+    }
+    return true;
+  });
+
+  const icon = path.join(__dirname, "assets", "icons", "tray_icon.png");
+
+  tray = new Tray(icon);
+  tray.on("click", () => {
+    if (mainWindow.isVisible() === true) {
+      mainWindow.hide();
+    } else {
+      mainWindow.show();
+    }
+    tray.on("right-click", () => {
+      const contextMenu = Menu.buildFromTemplate([
+        {
+          label: "Quit",
+          click: () => {
+            app.isQuitting = true;
+            app.quit();
+          },
+        },
+      ]);
+      tray.popUpContextMenu(contextMenu);
+    });
+  });
+
+  mainWindow.on("ready", () => (mainWindow = null));
 });
 
 const menu = [
   ...(isMac ? [{ role: "appMenu" }] : []),
   {
     role: "fileMenu",
+  },
+  {
+    label: "View",
+    submenu: [
+      {
+        label: "Toggle Navigation",
+        click: () => mainWindow.webContents.send("nav:toggle"),
+      },
+      {
+        label: "Toggle Hostname",
+        click: () => mainWindow.webContents.send("comp-name:toggle"),
+      },
+    ],
   },
   ...(isDev
     ? [

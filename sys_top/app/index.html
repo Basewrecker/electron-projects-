@@ -90,6 +90,9 @@
         <script src="js/monitor.js"></script>
         <script>
             const settingsForm = document.getElementById("settings-form");
+            const navBottom = document.getElementById("nav");
+            const compName = document.getElementById("comp-name");
+            let nameVisible = true;
             ipcRenderer.on("settings:get", (e, settings) => {
                 document.getElementById("cpu-overload").value =
                     settings.cpuOverload;
@@ -120,6 +123,16 @@
 
                 setTimeout(() => alert.classList.add("hide"), 3000);
             }
+
+            ipcRenderer.on("nav:toggle", () => {
+                navBottom.classList.toggle("hide");
+            });
+
+            ipcRenderer.on("comp-name:toggle", () => {
+                compName.innerHTML = compName.innerHTML
+                    ? "******"
+                    : nodeOs.hostname();
+            });
         </script>
     </body>
 </html>
