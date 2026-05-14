@@ -1,8 +1,10 @@
-const { app, BrowserWindow, Menu, Tray } = require("electron");
+const { app, BrowserWindow, Menu } = require("electron");
 const path = require("path");
 const log = require("electron-log");
 const Store = require("./Store");
 const { ipcMain } = require("electron/main");
+const MainWindow = require("./MainWindow");
+const AppTray = require("./AppTray");
 
 // Set env
 process.env.NODE_ENV = "development";
@@ -24,25 +26,7 @@ const store = new Store({
 });
 
 function createMainWindow() {
-  mainWindow = new BrowserWindow({
-    title: "SysTop",
-    width: isDev ? 700 : 355,
-    height: 600,
-    icon: "./assets/icons/icon.png",
-    show: false,
-    opacity: 0.9,
-    resizable: isDev ? true : false,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-    },
-  });
-
-  if (isDev) {
-    mainWindow.webContents.openDevTools();
-  }
-
-  mainWindow.loadFile("./app/index.html");
+  mainWindow = new MainWindow("./app/index.html", isDev);
 }
 
 app.on("ready", () => {
@@ -64,13 +48,7 @@ app.on("ready", () => {
 
   const icon = path.join(__dirname, "assets", "icons", "tray_icon.png");
 
-  tray = new Tray(icon);
-  tray.on("click", () => {
-    if (mainWindow.isVisible() === true) {
-      mainWindow.hide();
-    } else {
-      mainWindow.show();
-    }
+  tray = new AppTray(icon, mainWindow);
     tray.on("right-click", () => {
       const contextMenu = Menu.buildFromTemplate([
         {
@@ -86,7 +64,7 @@ app.on("ready", () => {
   });
 
   mainWindow.on("ready", () => (mainWindow = null));
-});
+  
 
 const menu = [
   ...(isMac ? [{ role: "appMenu" }] : []),
